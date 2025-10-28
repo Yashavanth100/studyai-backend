@@ -4,5 +4,5 @@ python-dotenv==1.0.1
 langchain==0.1.14
 langchain-core==0.1.42
 langchain-google-genai==0.0.11
-google-generativeai==0.3.2
+google-generativeai==0.4.1
 pydantic==1.10.13
