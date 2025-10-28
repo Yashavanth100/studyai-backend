@@ -1,6 +1,6 @@
 fastapi
 uvicorn
 langchain
-google-generativeai
+langchain-google-genai
 python-dotenv
-
+google-generativeai
