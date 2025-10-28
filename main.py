@@ -18,7 +18,7 @@ app.add_middleware(
 # Initialize Gemini AI with correct model
 llm = ChatGoogleGenerativeAI(
     model="models/gemini-2.5-flash",
-    google_api_key=""  # <-- Add your real Google API key here
+    google_api_key="AIzaSyB_MWOSd39SvbE6sc2ffbK0kRCYX4FaF8Y"  # <-- Add your real Google API key here
 )
 
 # Pydantic model for request body
