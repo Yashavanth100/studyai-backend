@@ -15,13 +15,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Gemini AI with correct model
+# Initialize Gemini AI
 llm = ChatGoogleGenerativeAI(
-    model="models/gemini-2.5-flash",
-    google_api_key="AIzaSyB_MWOSd39SvbE6sc2ffbK0kRCYX4FaF8Y"  # <-- Add your real Google API key here
+    model="models/gemini-2.0-flash",
+    google_api_key="AIzaSyB_MWOSd39SvbE6sc2ffbK0kRCYX4FaF8Y",  # 🔑 Replace this
 )
 
-# Pydantic model for request body
 class Question(BaseModel):
     question: str
 
@@ -32,35 +31,47 @@ def read_root():
 @app.post("/ask")
 async def ask_question(q: Question):
     try:
-        # 🧠 System prompt to enforce structured format
+        # 🧠 More structured and Markdown-friendly prompt
         system_prompt = """
-You are a smart, structured, and helpful AI tutor.
-Always answer in a clean, note-style format with this structure:
+You are a structured and educational AI tutor.
 
-**Topic:** <Main concept or definition>
+Always format your answer **clearly** in Markdown with proper line breaks and bold headers. 
+Use this exact format — each section must start on a new line.
+
+**Topic:** <Main concept>
 
 **Key Points:**
-1. <Key Point 1>
-2. <Key Point 2>
-3. <Key Point 3>
+1. <Short key point 1>
+2. <Short key point 2>
+3. <Short key point 3>
 
-**Example:** <Short, real-world example or use case>
+**Example:**
+<Give one short, realistic example with proper formatting and Markdown code block if needed.>
 
-Keep it concise, educational, and easy to read for students.
+Be concise (max 150 words) and easy to read for students.
+Add `\n\n` line breaks where needed.
 """
 
-        # Create chat prompt using LangChain
         prompt = ChatPromptTemplate.from_template(
             f"{system_prompt}\n\nQuestion: {{question}}"
         )
+
         prompt_text = prompt.format_prompt(question=q.question).to_string()
 
-        # Call Gemini model
+        # Run the model
         response = llm.invoke(prompt_text)
 
-        # Return structured formatted content
-        return {"answer": response.content.strip()}
+        # ✨ Ensure proper spacing and readability
+        formatted_answer = (
+            response.content.replace("**Key Points:**", "\n\n**Key Points:**")
+            .replace("**Example:**", "\n\n**Example:**")
+            .replace("1.", "\n1.")
+            .replace("2.", "\n2.")
+            .replace("3.", "\n3.")
+            .strip()
+        )
+
+        return {"answer": formatted_answer}
 
     except Exception as e:
-        # Return error for debugging
         return {"error": str(e)}
